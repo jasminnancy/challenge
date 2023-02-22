@@ -13,10 +13,14 @@ import { getSubscribers } from "./services/subscriber";
 
 // Styles
 import "./App.css";
+import { PrimaryButton } from "./components/Button/Button";
 
 function App() {
   const [page, setPage] = useQueryParam("page", withDefault(NumberParam, 1));
-  const [perPage] = useQueryParam("perPage", withDefault(NumberParam, 25));
+  const [perPage, setPerPage] = useQueryParam(
+    "perPage",
+    withDefault(NumberParam, 25)
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [focusedSubscriberId, setFocusedSubscriberId] = useState("");
   const [focusedSubscriberStatus, setFocusedSubscriberStatus] = useState(false);
@@ -88,6 +92,10 @@ function App() {
     resetModal();
   };
 
+  const handlePaginationButton = () => {
+    setPerPage(perPage === 25 ? 10 : 25);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900">
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
@@ -108,9 +116,14 @@ function App() {
             {pagination?.total} Subscribers{" "}
             {isLoading && <LoadingSpinner className="ml-4" />}
           </h1>
-          <SecondaryButton onClick={handleAddSubscriberModal}>
-            Add Subscriber
-          </SecondaryButton>
+          <div className="space-x-2">
+            <PrimaryButton onClick={handlePaginationButton}>{`Show ${
+              perPage === 25 ? 10 : 25
+            } Per Page`}</PrimaryButton>
+            <SecondaryButton onClick={handleAddSubscriberModal}>
+              Add Subscriber
+            </SecondaryButton>
+          </div>
         </div>
         <div className="mt-6">
           <SubscriberTable
