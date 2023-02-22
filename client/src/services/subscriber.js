@@ -1,32 +1,35 @@
-const axios = require('axios');
+const axios = require("axios");
+
+const URL = "https://sleepy-mountain-03235.herokuapp.com";
+const SUBSCRIBER_ENDPOINT = URL + "/api/subscribers";
 
 export const getSubscribers = (params = {}) => {
   const headers = {
-    'Content-Type': 'application/json'
-  }
+    "Content-Type": "application/json",
+  };
 
-  return axios.get('/api/subscribers', {
+  return axios.get(SUBSCRIBER_ENDPOINT, {
     params: params,
-    headers: headers
-  })
-}
+    headers: headers,
+  });
+};
 
 export const createSubscriber = (payload = {}) => {
   const headers = {
-    'Content-Type': 'application/json'
-  }
+    "Content-Type": "application/json",
+  };
 
-  return axios.post('/api/subscribers', payload, {
-    headers: headers
-  })
-}
+  return axios.post(SUBSCRIBER_ENDPOINT, payload, {
+    headers: headers,
+  });
+};
 
 export const updateSubscriber = (subscriberId, payload = {}) => {
   const headers = {
-    'Content-Type': 'application/json'
-  }
+    "Content-Type": "application/json",
+  };
 
-  return axios.patch(`/api/subscribers/${subscriberId}`, payload, {
-    headers: headers
-  })
-}
+  return axios.patch(`${SUBSCRIBER_ENDPOINT}/${subscriberId}`, payload, {
+    headers: headers,
+  });
+};
