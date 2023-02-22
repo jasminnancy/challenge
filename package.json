@@ -14,5 +14,9 @@
     "start:server": "bundle exec foreman start",
     "test": "npm run --prefix client build",
     "watch:app": "npm --prefix client start"
+  },
+  "dependencies": {
+    "firebase": "^9.17.1",
+    "firebase-tools": "^11.23.1"
   }
 }
