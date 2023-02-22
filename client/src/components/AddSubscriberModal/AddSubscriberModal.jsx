@@ -1,52 +1,76 @@
 import { useState } from "react";
-import PropTypes from 'prop-types'
-import Button, { SecondaryButton } from '../Button'
-import Modal, { ModalBody, ModalFooter } from '../Modal'
+import PropTypes from "prop-types";
+import Button, { SecondaryButton } from "../Button";
+import Modal, { ModalBody, ModalFooter } from "../Modal";
 
 import { createSubscriber } from "../../services/subscriber";
 
 const AddSubscriberModal = (props) => {
-  const { isOpen, onClose, onSuccess } = props
-  const [isSaving, setIsSaving] = useState(false)
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
+  const { isOpen, onClose, onSuccess } = props;
+  const [isSaving, setIsSaving] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState();
+
+  const resetState = () => {
+    setEmail("");
+    setName("");
+    setError();
+  };
+
+  const handleClose = () => {
+    resetState();
+    onClose();
+  };
 
   const handleChange = (e) => {
-    const { target: { name, value }} = e
+    const {
+      target: { name, value },
+    } = e;
 
-    if (name === 'email') {
-      setEmail(value)
-    } else if (name === 'name') {
-      setName(value)
+    if (name === "email") {
+      setEmail(value);
+    } else if (name === "name") {
+      setName(value);
     }
-  }
+  };
+
   const onSubmit = () => {
     const payload = {
       email,
-      name
-    }
+      name,
+    };
 
-    setIsSaving(true)
+    setIsSaving(true);
     createSubscriber(payload)
-    .then(() => {
-      onSuccess()
-    })
-    .catch((payload) => {
-      const error = payload?.response?.data?.message || 'Something went wrong'
-      console.error(error)
-    })
-    .finally(() => {
-      setIsSaving(false)
-    })
-  }
+      .then(({ data }) => {
+        resetState();
+        onSuccess(data);
+      })
+      .catch((payload) => {
+        const error =
+          payload?.response?.data?.message || "Something went wrong";
+        setError(error);
+      })
+      .finally(() => {
+        setIsSaving(false);
+      });
+  };
 
   return (
-    <Modal modalTitle="Add Subscriber" showModal={isOpen} onCloseModal={onClose}>
+    <Modal
+      modalTitle="Add Subscriber"
+      showModal={isOpen}
+      onCloseModal={handleClose}
+    >
       <>
         <ModalBody>
           <form className="my-4 text-blueGray-500 text-lg leading-relaxed">
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="email"
+              >
                 Email*
               </label>
               <input
@@ -59,7 +83,10 @@ const AddSubscriberModal = (props) => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="name"
+              >
                 Name
               </label>
               <input
@@ -72,12 +99,13 @@ const AddSubscriberModal = (props) => {
               />
             </div>
           </form>
+          {error && <div className="text-red-400">{error}</div>}
         </ModalBody>
         <ModalFooter>
           <SecondaryButton
             className="background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1"
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
           >
             Cancel
           </SecondaryButton>
@@ -93,12 +121,12 @@ const AddSubscriberModal = (props) => {
       </>
     </Modal>
   );
-}
+};
 
 AddSubscriberModal.propTypes = {
-  isOpen: PropTypes.bool, 
+  isOpen: PropTypes.bool,
   onClose: PropTypes.func,
-  onSuccess: PropTypes.func
-}
+  onSuccess: PropTypes.func,
+};
 
-export default AddSubscriberModal
+export default AddSubscriberModal;

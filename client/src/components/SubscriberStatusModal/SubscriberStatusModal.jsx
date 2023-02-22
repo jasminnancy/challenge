@@ -1,64 +1,60 @@
 import { useState } from "react";
-import Modal, { ModalBody, ModalFooter } from '../Modal'
-import PropTypes from 'prop-types';
+import Modal, { ModalBody, ModalFooter } from "../Modal";
+import PropTypes from "prop-types";
 
 // Components
-import Button, { SecondaryButton } from '../Button';
+import Button, { SecondaryButton } from "../Button";
 
 // Services
 import { updateSubscriber } from "../../services/subscriber";
 
 const SubscriberStatusModal = (props) => {
   const { isOpen, onSuccess, onClose, subscriberId, status } = props;
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState();
 
   const onUpdate = () => {
     const payload = {
-      status: status === 'active' ? 'inactive' : 'active'
-    }
+      status: !status,
+    };
 
-    setIsDeleting(true)
+    setIsUpdating(true);
     updateSubscriber(subscriberId, payload)
-    .then(() => {
-      onSuccess()
-    })
-    .catch((payload) => {
-      const error = payload?.response?.data?.message || 'Something went wrong'
-      console.error(error)
-    })
-    .finally(() => {
-      setIsDeleting(false)
-    })
-  }
+      .then(({ data }) => {
+        onSuccess(data);
+      })
+      .catch((payload) => {
+        const error =
+          payload?.response?.data?.message || "Something went wrong";
+        setError(error);
+      })
+      .finally(() => {
+        setIsUpdating(false);
+      });
+  };
 
-  const modalTitleText = status === 'active' ? 
-    "Unsubscribe" : "Resubscribe"
-  const messageBodyText = status === 'active' ? 
-    "Are you sure you'd like to unsubscribe this subscriber?" :
-    "Are you sure you'd like to resubscribe this subscriber?"
-  const buttonText = status === 'active' ? 
-    "Unsubscribe" : "Resubscribe"
+  const modalTitleText = status ? "Unsubscribe" : "Resubscribe";
+  const messageBodyText = `Are you sure you'd like to ${
+    status ? "unsubscribe" : "resubscribe"
+  } to this subscriber?`;
+  const buttonText = status ? "Unsubscribe" : "Resubscribe";
 
   return (
-    <Modal modalTitle={modalTitleText} showModal={isOpen} onCloseModal={onClose}>
+    <Modal
+      modalTitle={modalTitleText}
+      showModal={isOpen}
+      onCloseModal={onClose}
+    >
       <>
-        <ModalBody>
-          {messageBodyText}
-        </ModalBody>
+        <ModalBody>{messageBodyText}</ModalBody>
         <ModalFooter>
-          <SecondaryButton
-            className="mx-2"
-            onClick={onClose}
-          >
+          <SecondaryButton className="mx-2" onClick={onClose}>
             Cancel
           </SecondaryButton>
-          <Button
-            type="primary"
-            loading={isDeleting}
-            onClick={onUpdate}
-          >
+          <Button type="primary" loading={isUpdating} onClick={onUpdate}>
             {buttonText}
           </Button>
+          {error && <div>{error}</div>}
         </ModalFooter>
       </>
     </Modal>
@@ -70,7 +66,7 @@ SubscriberStatusModal.propTypes = {
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
   subscriberId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  status: PropTypes.string
-}
+  status: PropTypes.bool,
+};
 
 export default SubscriberStatusModal;

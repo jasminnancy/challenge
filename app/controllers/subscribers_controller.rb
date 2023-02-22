@@ -3,59 +3,45 @@
 class SubscribersController < ApplicationController
   include PaginationMethods
 
+  def get_total_subscriber_count
+    subscribers = Subscriber.all
+    return pagination(subscribers.count)
+  end
+
   ##
   # GET /api/subscribers
   def index
-    subscribers = [
-      {
-        id: 1,
-        name: "Rick Sanchez",
-        email: "rickc137@citadel.com",
-        status: "active"
-      },
-      {
-        id: 2,
-        name: "Morty Smith",
-        email: "morty.smith@gmail.com",
-        status: "inactive"
-      },
-      {
-        id: 3,
-        name: "Jerry Smith",
-        email: "jerry.smith@aol.com",
-        status: "active"
-      },
-      {
-        id: 4,
-        name: "Beth Smith",
-        email: "beth.smith@gmail.com",
-        status: "active"
-      },
-      {
-        id: 5,
-        name: "Summer Smith",
-        email: "summer.smith@gmail.com",
-        status: "active"
-      },
-      {
-        id: 6,
-        name: "Bird Person",
-        email: "bird.person@birdworld.com",
-        status: "active"
-      }
-    ]
+    @subscribers = Subscriber.all
+    limited_subscribers = @subscribers.drop(offset).first(limit)
 
-    total_records = subscribers.count
-    limited_subscribers = subscribers.drop(offset).first(limit)
-
-    render json: {subscribers: limited_subscribers, pagination: pagination(total_records)}, formats: :json
+    render json: {subscribers: limited_subscribers, pagination: get_total_subscriber_count}, formats: :json
   end
 
   def create
-    render json: {message: "Subscriber created successfully"}, formats: :json, status: :created
+    subscriber = Subscriber.new(email: params['email'], name: params['name'], status: false)
+
+    if subscriber.save
+      render json: {subscriber: subscriber, pagination: get_total_subscriber_count, message: "Subscriber created successfully"}, formats: :json, status: :created
+    else
+      render json: {message: "Subscriber exists already"}, formats: :json, status: :not_acceptable
+    end
   end
 
   def update
-    render json: {message: "Subscriber updated successfully"}, formats: :json, status: :ok
+    subscriber = Subscriber.find(params['id'])
+
+    if subscriber.update(subscriber_params)   
+      @subscribers = Subscriber.all
+      limited_subscribers = @subscribers.drop(offset).first(limit)
+
+      render json: {subscribers: limited_subscribers, message: "Subscriber updated successfully"}, formats: :json, status: :ok
+    else
+      render json: {message: "We're sorry... something happened. The subscriber could not be updated at this time"}, formats: :json, status: :not_acceptable
+    end
+  end
+
+  private
+  def subscriber_params
+    params.require(:subscriber).permit(:email, :name, :status)
   end
 end

@@ -1,8 +1,8 @@
-import PropTypes from 'prop-types';
-import StatusPill from '../StatusPill'
+import PropTypes from "prop-types";
+import StatusPill from "../StatusPill";
 
 const SubscriberTable = (props) => {
-  const { subscribers, onChangeStatusSelected } = props
+  const { subscribers, onChangeStatusSelected } = props;
 
   return (
     <div className="flex flex-col">
@@ -39,17 +39,29 @@ const SubscriberTable = (props) => {
                 {subscribers.map((subscriber) => (
                   <tr key={subscriber.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{subscriber.name}</div>
+                      <div className="text-sm text-gray-900">
+                        {subscriber.name}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{subscriber.email}</div>
+                      <div className="text-sm text-gray-900">
+                        {subscriber.email}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <StatusPill value={subscriber.status} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-primary-gold-600 hover:text-primary-gold-900 underline" onClick={() => onChangeStatusSelected(subscriber.id, subscriber.status)}>
-                        {subscriber.status === 'active' ? 'Unsubscribe' : 'Subscribe'}
+                      <button
+                        className="text-primary-gold-600 hover:text-primary-gold-900 underline"
+                        onClick={() =>
+                          onChangeStatusSelected(
+                            subscriber.id,
+                            subscriber.status
+                          )
+                        }
+                      >
+                        {subscriber.status ? "Unsubscribe" : "Subscribe"}
                       </button>
                     </td>
                   </tr>
@@ -60,8 +72,8 @@ const SubscriberTable = (props) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 SubscriberTable.propTypes = {
   subscribers: PropTypes.arrayOf(
@@ -69,15 +81,15 @@ SubscriberTable.propTypes = {
       id: PropTypes.number,
       email: PropTypes.string,
       name: PropTypes.string,
-      status: PropTypes.string
+      status: PropTypes.bool,
     })
   ),
-  onChangeStatusSelected: PropTypes.func
-}
+  onChangeStatusSelected: PropTypes.func,
+};
 
 SubscriberTable.defaultProps = {
   subscribers: [],
-  onChangeStatusSelected: () => {}
-}
+  onChangeStatusSelected: () => {},
+};
 
-export default SubscriberTable
+export default SubscriberTable;
